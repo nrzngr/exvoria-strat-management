@@ -123,8 +123,11 @@ export async function getStrategies(mapId?: string): Promise<StrategyWithVersion
     return []
   }
 
+  // Store supabase in local variable to satisfy TypeScript
+  const db = supabase
+
   // Try using RPC approach to get the data with proper joins
-  const { data: rpcData, error: rpcError } = await supabase.rpc('get_strategies_with_versions', {
+  const { data: rpcData, error: rpcError } = await db.rpc('get_strategies_with_versions', {
     p_map_id: mapId || null
   })
 
@@ -132,7 +135,7 @@ export async function getStrategies(mapId?: string): Promise<StrategyWithVersion
     console.error('RPC query error, falling back to regular query:', rpcError)
 
     // Fallback to regular query with simpler join
-    let fallbackQuery = supabase
+    let fallbackQuery = db
       .from('strategies')
       .select(`
         *,
@@ -157,7 +160,7 @@ export async function getStrategies(mapId?: string): Promise<StrategyWithVersion
       (fallbackData || []).map(async (strategy) => {
         console.log(`=== Processing strategy ${strategy.id}, current_version_id: ${strategy.current_version_id} ===`)
         if (strategy.current_version_id) {
-          const { data: versionData, error: versionError } = await supabase
+          const { data: versionData, error: versionError } = await db
             .from('strategy_versions')
             .select('*')
             .eq('id', strategy.current_version_id)
@@ -196,7 +199,7 @@ export async function getStrategies(mapId?: string): Promise<StrategyWithVersion
     console.log('Number of strategies fetched:', rpcData?.length || 0)
 
     // Parse JSON data from RPC
-    const parsedData = rpcData.map(item => {
+    const parsedData = rpcData.map((item: any) => {
       const strategy = typeof item === 'string' ? JSON.parse(item) : item
       console.log(`RPC Strategy ${strategy.id}:`, {
         id: strategy.id,
@@ -212,6 +215,9 @@ export async function getStrategies(mapId?: string): Promise<StrategyWithVersion
     console.log('=== END RPC DEBUG DATA ===')
     return parsedData
   }
+
+  // Return empty array if no data found
+  return []
 }
 
 export async function getStrategy(id: string): Promise<StrategyWithVersion | null> {
@@ -219,8 +225,11 @@ export async function getStrategy(id: string): Promise<StrategyWithVersion | nul
     return null
   }
 
+  // Store supabase in local variable to satisfy TypeScript
+  const db = supabase
+
   // Try using RPC first
-  const { data: rpcData, error: rpcError } = await supabase.rpc('get_strategy_with_version', {
+  const { data: rpcData, error: rpcError } = await db.rpc('get_strategy_with_version', {
     p_strategy_id: id
   })
 
@@ -228,7 +237,7 @@ export async function getStrategy(id: string): Promise<StrategyWithVersion | nul
     console.error('Strategy RPC error, falling back to regular query:', rpcError)
 
     // Fallback to regular query with manual version fetching
-    const { data: strategyData, error: strategyError } = await supabase
+    const { data: strategyData, error: strategyError } = await db
       .from('strategies')
       .select(`
         *,
@@ -246,7 +255,7 @@ export async function getStrategy(id: string): Promise<StrategyWithVersion | nul
     // Manually fetch current version
     let current_version = null
     if (strategyData?.current_version_id) {
-      const { data: versionData } = await supabase
+      const { data: versionData } = await db
         .from('strategy_versions')
         .select('*')
         .eq('id', strategyData.current_version_id)
@@ -255,7 +264,12 @@ export async function getStrategy(id: string): Promise<StrategyWithVersion | nul
       current_version = versionData
     }
 
-    const finalData = { ...strategyData, current_version }
+    const finalData = { 
+      ...strategyData, 
+      current_version,
+      title: (strategyData as any).title || (current_version?.title || ''),
+      description: (strategyData as any).description || (current_version?.description || '')
+    }
 
     console.log('=== DEBUG: Single strategy data from fallback ===')
     console.log('Strategy ID:', id)
@@ -298,10 +312,13 @@ export async function getStrategyWithCache(id: string): Promise<StrategyWithVers
   }
 
   try {
+    // Store supabase in local variable to satisfy TypeScript
+    const db = supabase
+
     // Add cache busting parameter to force fresh data
     const cacheBuster = Date.now()
 
-    const { data: strategyData, error: strategyError } = await supabase
+    const { data: strategyData, error: strategyError } = await db
       .from('strategies')
       .select(`
         id,
@@ -324,7 +341,7 @@ export async function getStrategyWithCache(id: string): Promise<StrategyWithVers
     // Manually fetch current version if it exists
     let current_version = null
     if (strategyData?.current_version_id) {
-      const { data: versionData } = await supabase
+      const { data: versionData } = await db
         .from('strategy_versions')
         .select('*')
         .eq('id', strategyData.current_version_id)
@@ -333,7 +350,18 @@ export async function getStrategyWithCache(id: string): Promise<StrategyWithVers
       current_version = versionData
     }
 
-    const finalData = { ...strategyData, current_version }
+    // Type cast strategyData to access title and description
+    const strategyDataWithFields = strategyData as any
+    
+    const finalData: StrategyWithVersion = { 
+      ...strategyData, 
+      current_version,
+      title: strategyDataWithFields.title || (current_version?.title || ''),
+      description: strategyDataWithFields.description || (current_version?.description || ''),
+      map: strategyDataWithFields.map as Map,
+      images: strategyDataWithFields.images || []
+    }
+    
     return finalData
   } catch (error) {
     console.error('Error in getStrategyWithCache:', error)
@@ -347,8 +375,11 @@ export async function createStrategy(strategyData: CreateStrategyForm): Promise<
   }
 
   try {
+    // Store supabase in local variable to satisfy TypeScript
+    const db = supabase
+
     // First create the strategy
-    const { data: strategy, error: strategyError } = await supabase
+    const { data: strategy, error: strategyError } = await db
       .from('strategies')
       .insert({
         map_id: strategyData.map_id,
@@ -361,7 +392,7 @@ export async function createStrategy(strategyData: CreateStrategyForm): Promise<
     if (strategyError) throw strategyError
 
     // Then create the initial version
-    const { data: version, error: versionError } = await supabase
+    const { data: version, error: versionError } = await db
       .from('strategy_versions')
       .insert({
         strategy_id: strategy.id,
@@ -376,7 +407,7 @@ export async function createStrategy(strategyData: CreateStrategyForm): Promise<
     if (versionError) throw versionError
 
     // Update strategy with current version
-    const { data: updatedStrategy, error: updateError } = await supabase
+    const { data: updatedStrategy, error: updateError } = await db
       .from('strategies')
       .update({ current_version_id: version.id })
       .eq('id', strategy.id)
@@ -389,7 +420,7 @@ export async function createStrategy(strategyData: CreateStrategyForm): Promise<
     if (updateError) throw updateError
 
     // Manually fetch the current version since we can't use the foreign key relationship
-    const { data: currentVersion, error: versionFetchError } = await supabase
+    const { data: currentVersion, error: versionFetchError } = await db
       .from('strategy_versions')
       .select('*')
       .eq('id', version.id)
@@ -420,8 +451,11 @@ export async function updateStrategy(id: string, strategyData: UpdateStrategyFor
   }
 
   try {
+    // Store supabase in local variable to satisfy TypeScript
+    const db = supabase
+
     // First get the current strategy to find the latest version number
-    const { data: currentStrategy, error: fetchError } = await supabase
+    const { data: currentStrategy, error: fetchError } = await db
       .from('strategies')
       .select('current_version_id')
       .eq('id', id)
@@ -432,7 +466,7 @@ export async function updateStrategy(id: string, strategyData: UpdateStrategyFor
     // Get the latest version number
     let nextVersionNumber = 1
     if (currentStrategy?.current_version_id) {
-      const { data: currentVersion } = await supabase
+      const { data: currentVersion } = await db
         .from('strategy_versions')
         .select('version_number')
         .eq('id', currentStrategy.current_version_id)
@@ -444,7 +478,7 @@ export async function updateStrategy(id: string, strategyData: UpdateStrategyFor
     }
 
     // Create new version
-    const { data: newVersion, error: versionError } = await supabase
+    const { data: newVersion, error: versionError } = await db
       .from('strategy_versions')
       .insert({
         strategy_id: id,
@@ -459,7 +493,7 @@ export async function updateStrategy(id: string, strategyData: UpdateStrategyFor
     if (versionError) throw versionError
 
     // Update strategy with new current version
-    const { data: updatedStrategy, error: updateError } = await supabase
+    const { data: updatedStrategy, error: updateError } = await db
       .from('strategies')
       .update({
         current_version_id: newVersion.id,
@@ -476,7 +510,7 @@ export async function updateStrategy(id: string, strategyData: UpdateStrategyFor
     if (updateError) throw updateError
 
     // Fetch images for this strategy
-    const { data: images } = await supabase
+    const { data: images } = await db
       .from('strategy_images')
       .select('*')
       .eq('strategy_id', id)
@@ -593,7 +627,10 @@ export async function searchStrategies(query: string, mapId?: string): Promise<S
   }
 
   try {
-    let dbQuery = supabase
+    // Store supabase in local variable to satisfy TypeScript
+    const db = supabase
+
+    let dbQuery = db
       .from('strategies')
       .select(`
         *,
@@ -615,15 +652,25 @@ export async function searchStrategies(query: string, mapId?: string): Promise<S
     const strategiesWithVersions = await Promise.all(
       (strategies || []).map(async (strategy) => {
         if (strategy.current_version_id) {
-          const { data: versionData } = await supabase
+          const { data: versionData } = await db
             .from('strategy_versions')
             .select('*')
             .eq('id', strategy.current_version_id)
             .single()
 
-          return { ...strategy, current_version: versionData }
+          return { 
+            ...strategy, 
+            current_version: versionData,
+            title: (strategy as any).title || (versionData?.title || ''),
+            description: (strategy as any).description || (versionData?.description || '')
+          }
         }
-        return { ...strategy, current_version: null }
+        return { 
+          ...strategy, 
+          current_version: null,
+          title: (strategy as any).title || '',
+          description: (strategy as any).description || ''
+        }
       })
     )
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, AnimatePresence, MotionProps } from 'framer-motion'
+import { motion, AnimatePresence, MotionProps, Variants, Transition } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { pageTransition } from '@/lib/animations'
 
@@ -17,7 +17,7 @@ export function PageTransitionProvider({ children, className }: PageTransitionPr
     <AnimatePresence mode="wait">
       <motion.div
         key={pathname}
-        variants={pageTransition}
+        variants={pageTransition as Variants}
         initial="hidden"
         animate="visible"
         exit="exit"
@@ -60,16 +60,18 @@ export function AnimatedPage({ children, className, variant = 'fade' }: Animated
     }
   }
 
+  const transition: Transition = {
+    duration: 0.4,
+    ease: [0.4, 0, 0.2, 1] as const
+  }
+
   return (
     <motion.div
-      variants={variants[variant]}
+      variants={variants[variant] as Variants}
       initial="hidden"
       animate="visible"
       exit="exit"
-      transition={{
-        duration: 0.4,
-        ease: [0.4, 0, 0.2, 1]
-      }}
+      transition={transition}
       className={className}
     >
       {children}
@@ -97,16 +99,18 @@ export function RouteTransition({ children, direction = 'forward' }: RouteTransi
     }
   }
 
+  const transition: Transition = {
+    duration: 0.3,
+    ease: [0.4, 0, 0.2, 1] as const
+  }
+
   return (
     <motion.div
-      variants={slideVariants[direction]}
+      variants={slideVariants[direction] as Variants}
       initial="hidden"
       animate="visible"
       exit="exit"
-      transition={{
-        duration: 0.3,
-        ease: [0.4, 0, 0.2, 1]
-      }}
+      transition={transition}
     >
       {children}
     </motion.div>
@@ -136,7 +140,7 @@ export function LayoutTransition({
           duration: 0.6,
           delay,
           staggerChildren: stagger ? 0.1 : 0,
-          when: "beforeChildren"
+          when: "beforeChildren" as const
         }
       }
     },
@@ -148,7 +152,7 @@ export function LayoutTransition({
         transition: {
           duration: 0.5,
           delay,
-          ease: [0.4, 0, 0.2, 1]
+          ease: [0.4, 0, 0.2, 1] as const
         }
       }
     },
@@ -161,7 +165,7 @@ export function LayoutTransition({
         transition: {
           duration: 0.4,
           delay,
-          ease: [0.4, 0, 0.2, 1]
+          ease: [0.4, 0, 0.2, 1] as const
         }
       }
     }
@@ -169,7 +173,7 @@ export function LayoutTransition({
 
   return (
     <motion.div
-      variants={variants[type]}
+      variants={variants[type] as Variants}
       initial="hidden"
       animate="visible"
     >
@@ -194,17 +198,19 @@ export function AnimatedSection({
   delay = 0,
   duration = 0.6
 }: AnimatedSectionProps) {
+  const transition: Transition = {
+    duration,
+    delay,
+    ease: [0.4, 0, 0.2, 1] as const
+  }
+
   return (
     <motion.div
       className={className}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: threshold }}
-      transition={{
-        duration,
-        delay,
-        ease: [0.4, 0, 0.2, 1]
-      }}
+      transition={transition}
       variants={{
         hidden: { opacity: 0, y: 40 },
         visible: { opacity: 1, y: 0 }
@@ -254,7 +260,7 @@ export function StaggerContainer({
 interface StaggerItemProps {
   children: React.ReactNode
   className?: string
-  variants?: any
+  variants?: Variants
 }
 
 export function StaggerItem({ children, className, variants }: StaggerItemProps) {
@@ -375,7 +381,7 @@ export function FadeIn({
         transition: {
           duration,
           delay,
-          ease: [0.4, 0, 0.2, 1]
+          ease: [0.4, 0, 0.2, 1] as const
         }
       }
     }

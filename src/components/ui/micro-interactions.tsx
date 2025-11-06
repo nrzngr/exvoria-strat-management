@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { MotionDiv } from '@/lib/animations'
-import { motion } from 'framer-motion'
+import { motion, Variants, Transition } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 // Hover Card with advanced effects
@@ -300,7 +300,7 @@ export function ScrollReveal({
     return () => observer.disconnect()
   }, [threshold])
 
-  const getVariants = () => {
+  const getVariants = (): Variants => {
     const directions = {
       up: { y: 50 },
       down: { y: -50 },
@@ -317,7 +317,7 @@ export function ScrollReveal({
         transition: {
           duration: 0.8,
           delay,
-          ease: [0.4, 0, 0.2, 1]
+          ease: [0.4, 0, 0.2, 1] as const
         }
       }
     }

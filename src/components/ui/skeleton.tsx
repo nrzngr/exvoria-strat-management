@@ -1,7 +1,7 @@
 'use client'
 
 import { MotionDiv } from '@/lib/animations'
-import { cn } from 'clsx'
+import { cn } from '@/lib/utils'
 
 // Base Skeleton Component
 interface SkeletonProps {
@@ -183,7 +183,8 @@ export function GridSkeleton({
   type = 'card',
   className
 }: GridSkeletonProps) {
-  const skeletons = Array.from({ length: count }, (_, i) => i)
+  // Fixed: Explicitly type the array to ensure index is a number
+  const skeletons = Array.from({ length: count }, (_, i: number) => i)
 
   const getSkeletonComponent = () => {
     switch (type) {
@@ -263,13 +264,13 @@ export function ListSkeleton({
 }: ListSkeletonProps) {
   return (
     <div className={cn('space-y-4', className)}>
-      {Array.from({ length: rows }).map((_, rowIndex) => (
+      {Array.from({ length: rows }).map((_, rowIndex: number) => (
         <div
           key={rowIndex}
           className="glass-effect rounded-xl p-4 border border-gray-800"
         >
           <div className="flex items-center space-x-4">
-            {Array.from({ length: columns }).map((_, colIndex) => (
+            {Array.from({ length: columns }).map((_, colIndex: number) => (
               <Skeleton
                 key={colIndex}
                 variant="text"
@@ -306,9 +307,12 @@ interface StatsSkeletonProps {
 }
 
 export function StatsSkeleton({ count = 4, className }: StatsSkeletonProps) {
+  // Fixed: Explicitly type the array to ensure index is a number
+  const skeletons = Array.from({ length: count }, (_, i: number) => i)
+
   return (
     <div className={cn('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6', className)}>
-      {Array.from({ length: count }).map((index) => (
+      {skeletons.map((index) => (
         <MotionDiv
           key={index}
           initial={{ opacity: 0, scale: 0.95 }}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -22,7 +22,7 @@ const strategySchema = z.object({
 
 type StrategyFormData = z.infer<typeof strategySchema>
 
-export default function NewStrategyPage() {
+function NewStrategyContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mapId = searchParams.get('mapId')
@@ -111,7 +111,7 @@ export default function NewStrategyPage() {
     for (let index = 0; index < uploadedImages.length; index++) {
       const file = uploadedImages[index]
       try {
-        const result = await uploadImage(file, 'strategy-images', `strategies/${strategyId}`)
+        const result = await uploadImage(file, 'STRATEGY_IMAGES', `strategies/${strategyId}`)
         imageUrls.push(result.url)
 
         // Save image information to database with version association
@@ -199,343 +199,360 @@ export default function NewStrategyPage() {
   }
 
   return (
-    <EnvCheck>
-      <MotionDiv
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
-        className="max-w-4xl mx-auto space-y-8"
-      >
-        {/* Enhanced Header Section */}
-        <MotionDiv variants={staggerItem} className="relative">
-          {/* Background Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/3 to-white/2 rounded-2xl blur-3xl"></div>
+    <MotionDiv
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+      className="max-w-4xl mx-auto space-y-8"
+    >
+      {/* Enhanced Header Section */}
+      <MotionDiv variants={staggerItem} className="relative">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/3 to-white/2 rounded-2xl blur-3xl"></div>
 
-          <div className="relative glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
-            {/* Breadcrumb */}
-            <MotionDiv variants={fadeIn} className="mb-6">
-              <Link
-                href="/strategies"
-                className="inline-flex items-center text-gray-400 hover:text-white transition-colors duration-300"
+        <div className="relative glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
+          {/* Breadcrumb */}
+          <MotionDiv variants={fadeIn} className="mb-6">
+            <Link
+              href="/strategies"
+              className="inline-flex items-center text-gray-400 hover:text-white transition-colors duration-300"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Strategies
+            </Link>
+          </MotionDiv>
+
+          {/* Header Content */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+            <div className="flex items-center space-x-4">
+              <MotionDiv
+                animate={{ rotate: 360 }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Strategies
-              </Link>
-            </MotionDiv>
-
-            {/* Header Content */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-              <div className="flex items-center space-x-4">
-                <MotionDiv
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30"
-                >
-                  <Sparkles className="h-8 w-8 text-white" />
-                </MotionDiv>
-                <div>
-                  <h1 className="text-4xl font-bold text-gradient">Create New Strategy</h1>
-                </div>
+                <Sparkles className="h-8 w-8 text-white" />
+              </MotionDiv>
+              <div>
+                <h1 className="text-4xl font-bold text-gradient">Create New Strategy</h1>
               </div>
             </div>
           </div>
+        </div>
+      </MotionDiv>
+
+      {/* Error State */}
+      {error && (
+        <MotionDiv
+          variants={scaleIn}
+          initial="hidden"
+          animate="visible"
+          className="glass-effect border border-red-500/30 bg-red-600/10 rounded-xl p-6"
+        >
+          <div className="flex items-center space-x-3">
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <div className="text-red-400 font-medium">System Alert: {error}</div>
+          </div>
         </MotionDiv>
+      )}
 
-        {/* Error State */}
-        {error && (
-          <MotionDiv
-            variants={scaleIn}
-            initial="hidden"
-            animate="visible"
-            className="glass-effect border border-red-500/30 bg-red-600/10 rounded-xl p-6"
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              <div className="text-red-400 font-medium">System Alert: {error}</div>
-            </div>
-          </MotionDiv>
-        )}
+      {/* Form */}
+      <MotionDiv variants={staggerItem}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          {/* Basic Information Section */}
+          <MotionDiv variants={fadeIn} custom={0} className="space-y-6">
+            <div className="glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
+              <MotionDiv variants={fadeIn} initial="hidden" animate="visible" className="flex items-center space-x-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-gradient">Basic Information</h2>
+              </MotionDiv>
 
-        {/* Form */}
-        <MotionDiv variants={staggerItem}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {/* Basic Information Section */}
-            <MotionDiv variants={fadeIn} custom={0} className="space-y-6">
-              <div className="glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
-                <MotionDiv variants={fadeIn} initial="hidden" animate="visible" className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30">
-                    <FileText className="h-5 w-5 text-white" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gradient">Basic Information</h2>
-                </MotionDiv>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Map Selection */}
-                  <div>
-                    <label htmlFor="map_id" className="block text-sm font-medium text-white mb-2">
-                      Tactical Map *
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <MapPin className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <select
-                        id="map_id"
-                        {...register('map_id')}
-                        className="glass-button w-full pl-10 pr-3 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none"
-                        disabled={!!mapId}
-                      >
-                        <option value="" className="bg-gray-800">Select a map</option>
-                        {maps.map((map) => (
-                          <option key={map.id} value={map.id} className="bg-gray-800">
-                            {map.name}
-                          </option>
-                        ))}
-                      </select>
-                      {mapId && (
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        </div>
-                      )}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Map Selection */}
+                <div>
+                  <label htmlFor="map_id" className="block text-sm font-medium text-white mb-2">
+                    Tactical Map *
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MapPin className="h-5 w-5 text-gray-400" />
                     </div>
-                    {errors.map_id && (
-                      <p className="mt-2 text-sm text-red-400">{errors.map_id.message}</p>
-                    )}
+                    <select
+                      id="map_id"
+                      {...register('map_id')}
+                      className="glass-button w-full pl-10 pr-3 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none"
+                      disabled={!!mapId}
+                    >
+                      <option value="" className="bg-gray-800">Select a map</option>
+                      {maps.map((map) => (
+                        <option key={map.id} value={map.id} className="bg-gray-800">
+                          {map.name}
+                        </option>
+                      ))}
+                    </select>
                     {mapId && (
-                      <p className="mt-2 text-xs text-green-400 flex items-center">
-                        <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                        Map pre-selected from previous page
-                      </p>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      </div>
                     )}
                   </div>
-
-                  {/* Strategy Title */}
-                  <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-white mb-2">
-                      Strategy Title *
-                    </label>
-                    <input
-                      type="text"
-                      id="title"
-                      {...register('title')}
-                      className="glass-button w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none"
-                      placeholder="e.g., Rush A Site Strategy"
-                    />
-                    {errors.title && (
-                      <p className="mt-2 text-sm text-red-400">{errors.title.message}</p>
-                    )}
-                  </div>
+                  {errors.map_id && (
+                    <p className="mt-2 text-sm text-red-400">{errors.map_id.message}</p>
+                  )}
+                  {mapId && (
+                    <p className="mt-2 text-xs text-green-400 flex items-center">
+                      <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                      Map pre-selected from previous page
+                    </p>
+                  )}
                 </div>
 
-                {/* Description */}
-                <div className="mt-6">
-                  <label htmlFor="description" className="block text-sm font-medium text-white mb-2">
-                    Strategy Description *
+                {/* Strategy Title */}
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-white mb-2">
+                    Strategy Title *
                   </label>
-                  <textarea
-                    id="description"
-                    rows={6}
-                    {...register('description')}
-                    className="glass-button w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none resize-none"
-                    placeholder="Describe your strategy in detail: objectives, positions, communication, etc..."
+                  <input
+                    type="text"
+                    id="title"
+                    {...register('title')}
+                    className="glass-button w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none"
+                    placeholder="e.g., Rush A Site Strategy"
                   />
-                  {errors.description && (
-                    <p className="mt-2 text-sm text-red-400">{errors.description.message}</p>
+                  {errors.title && (
+                    <p className="mt-2 text-sm text-red-400">{errors.title.message}</p>
                   )}
                 </div>
               </div>
-            </MotionDiv>
 
-            {/* Strategy Images Section */}
-            <MotionDiv variants={fadeIn} custom={1} className="space-y-6">
-              <div className="glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
-                <MotionDiv variants={fadeIn} initial="hidden" animate="visible" className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30">
-                    <ImageIcon className="h-5 w-5 text-white" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gradient">Tactical Diagrams</h2>
-                </MotionDiv>
+              {/* Description */}
+              <div className="mt-6">
+                <label htmlFor="description" className="block text-sm font-medium text-white mb-2">
+                  Strategy Description *
+                </label>
+                <textarea
+                  id="description"
+                  rows={6}
+                  {...register('description')}
+                  className="glass-button w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none resize-none"
+                  placeholder="Describe your strategy in detail: objectives, positions, communication, etc..."
+                />
+                {errors.description && (
+                  <p className="mt-2 text-sm text-red-400">{errors.description.message}</p>
+                )}
+              </div>
+            </div>
+          </MotionDiv>
 
-                {/* Image Upload Area */}
-                <div className="glass-effect rounded-xl p-8 border-2 border-dashed border-white/20 hover:border-white/30 transition-all duration-300 text-center group">
-                  <input
-                    type="file"
-                    id="strategy-images"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="hidden"
-                    disabled={submitting}
-                  />
-                  <label
-                    htmlFor="strategy-images"
-                    className="cursor-pointer flex flex-col items-center space-y-4"
-                  >
-                    <MotionDiv
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      className="w-20 h-20 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center border border-white/20 group-hover:border-white/30 transition-all duration-300"
-                    >
-                      <Upload className="h-10 w-10 text-gray-400" />
-                    </MotionDiv>
-                    <div>
-                      <span className="text-white font-medium">Upload Tactical Images</span>
-                      <p className="text-gray-400 text-sm mt-1">
-                        PNG, JPG, GIF up to 5MB each • Multiple files supported
-                      </p>
-                    </div>
-                  </label>
+          {/* Strategy Images Section */}
+          <MotionDiv variants={fadeIn} custom={1} className="space-y-6">
+            <div className="glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
+              <MotionDiv variants={fadeIn} initial="hidden" animate="visible" className="flex items-center space-x-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30">
+                  <ImageIcon className="h-5 w-5 text-white" />
                 </div>
+                <h2 className="text-2xl font-bold text-gradient">Tactical Diagrams</h2>
+              </MotionDiv>
 
-                {/* Image Previews */}
-                {imagePreviews.length > 0 && (
-                  <div className="mt-6">
-                    <MotionDiv variants={fadeIn} initial="hidden" animate="visible" className="flex items-center space-x-2 mb-4">
-                      <Eye className="h-5 w-5 text-blue-400" />
-                      <h3 className="text-lg font-semibold text-white">
-                        Selected Diagrams ({imagePreviews.length})
-                      </h3>
-                    </MotionDiv>
-                    <div className="space-y-4">
-                      {imagePreviews.map((preview, index) => (
-                        <MotionDiv
-                          key={index}
-                          variants={staggerItem}
-                          custom={index}
-                          initial="hidden"
-                          animate="visible"
-                          className="glass-effect rounded-xl p-6 border border-white/10"
-                        >
-                          <div className="flex gap-6">
-                            {/* Image Preview */}
-                            <div className="flex-shrink-0">
-                              <div className="w-32 h-32 rounded-xl overflow-hidden bg-black/60 border border-white/10">
-                                <img
-                                  src={preview}
-                                  alt={`Strategy diagram ${index + 1}`}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                              </div>
-                            </div>
+              {/* Image Upload Area */}
+              <div className="glass-effect rounded-xl p-8 border-2 border-dashed border-white/20 hover:border-white/30 transition-all duration-300 text-center group">
+                <input
+                  type="file"
+                  id="strategy-images"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                  disabled={submitting}
+                />
+                <label
+                  htmlFor="strategy-images"
+                  className="cursor-pointer flex flex-col items-center space-y-4"
+                >
+                  <MotionDiv
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-20 h-20 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center border border-white/20 group-hover:border-white/30 transition-all duration-300"
+                  >
+                    <Upload className="h-10 w-10 text-gray-400" />
+                  </MotionDiv>
+                  <div>
+                    <span className="text-white font-medium">Upload Tactical Images</span>
+                    <p className="text-gray-400 text-sm mt-1">
+                      PNG, JPG, GIF up to 5MB each • Multiple files supported
+                    </p>
+                  </div>
+                </label>
+              </div>
 
-                            {/* Image Details */}
-                            <div className="flex-1 space-y-4">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center border border-blue-500/30">
-                                    <ImageIcon className="h-4 w-4 text-blue-400" />
-                                  </div>
-                                  <h4 className="text-lg font-medium text-white">
-                                    Diagram {index + 1}
-                                  </h4>
-                                </div>
-                                <MotionDiv
-                                  whileHover={{ scale: 1.1 }}
-                                  whileTap={{ scale: 0.95 }}
-                                >
-                                  <button
-                                    type="button"
-                                    onClick={() => removeImage(index)}
-                                    className="p-2 rounded-lg glass-button text-red-400"
-                                    disabled={submitting}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                </MotionDiv>
-                              </div>
-
-                              <div className="text-sm text-gray-400">
-                                {uploadedImages[index]?.name}
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-white mb-2">
-                                  Tactical Description
-                                </label>
-                                <textarea
-                                  value={imageDescriptions[index] || ''}
-                                  onChange={(e) => updateImageDescription(index, e.target.value)}
-                                  className="glass-button w-full px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none resize-none"
-                                  rows={3}
-                                  placeholder="Describe this diagram (e.g., 'Initial setup positions', 'Flanking route', 'Final approach')"
-                                  disabled={submitting}
-                                />
-                              </div>
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                <div className="mt-6">
+                  <MotionDiv variants={fadeIn} initial="hidden" animate="visible" className="flex items-center space-x-2 mb-4">
+                    <Eye className="h-5 w-5 text-blue-400" />
+                    <h3 className="text-lg font-semibold text-white">
+                      Selected Diagrams ({imagePreviews.length})
+                    </h3>
+                  </MotionDiv>
+                  <div className="space-y-4">
+                    {imagePreviews.map((preview, index) => (
+                      <MotionDiv
+                        key={index}
+                        variants={staggerItem}
+                        custom={index}
+                        initial="hidden"
+                        animate="visible"
+                        className="glass-effect rounded-xl p-6 border border-white/10"
+                      >
+                        <div className="flex gap-6">
+                          {/* Image Preview */}
+                          <div className="flex-shrink-0">
+                            <div className="w-32 h-32 rounded-xl overflow-hidden bg-black/60 border border-white/10">
+                              <img
+                                src={preview}
+                                alt={`Strategy diagram ${index + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
                             </div>
                           </div>
-                        </MotionDiv>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </MotionDiv>
 
-            {/* Change Notes Section */}
-            <MotionDiv variants={fadeIn} custom={2}>
-              <div className="glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
-                <MotionDiv variants={fadeIn} initial="hidden" animate="visible" className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30">
-                    <Sparkles className="h-5 w-5 text-white" />
+                          {/* Image Details */}
+                          <div className="flex-1 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center border border-blue-500/30">
+                                  <ImageIcon className="h-4 w-4 text-blue-400" />
+                                </div>
+                                <h4 className="text-lg font-medium text-white">
+                                  Diagram {index + 1}
+                                </h4>
+                              </div>
+                              <MotionDiv
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => removeImage(index)}
+                                  className="p-2 rounded-lg glass-button text-red-400"
+                                  disabled={submitting}
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </MotionDiv>
+                            </div>
+
+                            <div className="text-sm text-gray-400">
+                              {uploadedImages[index]?.name}
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-white mb-2">
+                                Tactical Description
+                              </label>
+                              <textarea
+                                value={imageDescriptions[index] || ''}
+                                onChange={(e) => updateImageDescription(index, e.target.value)}
+                                className="glass-button w-full px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none resize-none"
+                                rows={3}
+                                placeholder="Describe this diagram (e.g., 'Initial setup positions', 'Flanking route', 'Final approach')"
+                                disabled={submitting}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </MotionDiv>
+                    ))}
                   </div>
-                  <h2 className="text-2xl font-bold text-gradient">Version Notes</h2>
+                </div>
+              )}
+            </div>
+          </MotionDiv>
+
+          {/* Change Notes Section */}
+          <MotionDiv variants={fadeIn} custom={2}>
+            <div className="glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
+              <MotionDiv variants={fadeIn} initial="hidden" animate="visible" className="flex items-center space-x-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30">
+                  <Sparkles className="h-5 w-5 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-gradient">Version Notes</h2>
+              </MotionDiv>
+
+              <textarea
+                id="change_notes"
+                rows={3}
+                {...register('change_notes')}
+                className="glass-button w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none resize-none"
+                placeholder="Optional: describe what makes this version special..."
+              />
+              {errors.change_notes && (
+                <p className="mt-2 text-sm text-red-400">{errors.change_notes.message}</p>
+              )}
+            </div>
+          </MotionDiv>
+
+          {/* Action Buttons */}
+          <MotionDiv variants={fadeIn} custom={3}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 flex items-center justify-center border border-green-500/30">
+                  <Save className="h-5 w-5 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Deploy Strategy</h3>
+                  <p className="text-sm text-gray-400">Create and save your tactical approach</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <MotionDiv variants={cardHover} whileHover="hover" whileTap="tap">
+                  <Link
+                    href="/strategies"
+                    className="glass-button px-6 py-3 rounded-xl text-gray-400 hover:text-white flex items-center space-x-2"
+                  >
+                    <X className="h-4 w-4" />
+                    <span className="font-medium">Cancel</span>
+                  </Link>
                 </MotionDiv>
 
-                <textarea
-                  id="change_notes"
-                  rows={3}
-                  {...register('change_notes')}
-                  className="glass-button w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none resize-none"
-                  placeholder="Optional: describe what makes this version special..."
-                />
-                {errors.change_notes && (
-                  <p className="mt-2 text-sm text-red-400">{errors.change_notes.message}</p>
-                )}
+                <MotionDiv variants={cardHover} whileHover="hover" whileTap="tap">
+                  <button
+                    type="submit"
+                    disabled={submitting || uploadingImages || !isDirty}
+                    className="glass-button px-6 py-3 rounded-xl text-green-400 hover:text-green-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span className="font-medium">
+                      {uploadingImages ? 'Uploading Images...' : submitting ? 'Creating Strategy...' : 'Create Strategy'}
+                    </span>
+                  </button>
+                </MotionDiv>
               </div>
-            </MotionDiv>
-
-            {/* Action Buttons */}
-            <MotionDiv variants={fadeIn} custom={3}>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 flex items-center justify-center border border-green-500/30">
-                    <Save className="h-5 w-5 text-green-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Deploy Strategy</h3>
-                    <p className="text-sm text-gray-400">Create and save your tactical approach</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <MotionDiv variants={cardHover} whileHover="hover" whileTap="tap">
-                    <Link
-                      href="/strategies"
-                      className="glass-button px-6 py-3 rounded-xl text-gray-400 hover:text-white flex items-center space-x-2"
-                    >
-                      <X className="h-4 w-4" />
-                      <span className="font-medium">Cancel</span>
-                    </Link>
-                  </MotionDiv>
-
-                  <MotionDiv variants={cardHover} whileHover="hover" whileTap="tap">
-                    <button
-                      type="submit"
-                      disabled={submitting || uploadingImages || !isDirty}
-                      className="glass-button px-6 py-3 rounded-xl text-green-400 hover:text-green-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span className="font-medium">
-                        {uploadingImages ? 'Uploading Images...' : submitting ? 'Creating Strategy...' : 'Create Strategy'}
-                      </span>
-                    </button>
-                  </MotionDiv>
-                </div>
-              </div>
-            </MotionDiv>
-          </form>
-        </MotionDiv>
+            </div>
+          </MotionDiv>
+        </form>
       </MotionDiv>
+    </MotionDiv>
+  )
+}
+
+export default function NewStrategyPage() {
+  return (
+    <EnvCheck>
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border border-white/30 mb-4">
+              <Sparkles className="h-8 w-8 text-white animate-spin" />
+            </div>
+            <p className="text-white">Loading strategy creation...</p>
+          </div>
+        </div>
+      }>
+        <NewStrategyContent />
+      </Suspense>
     </EnvCheck>
   )
 }
