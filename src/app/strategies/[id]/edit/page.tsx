@@ -185,7 +185,7 @@ export default function EditStrategyPage() {
     for (let index = 0; index < uploadedImages.length; index++) {
       const file = uploadedImages[index]
       try {
-        const result = await uploadImage(file, 'strategy-images', `strategies/${strategyId}`)
+        const result = await uploadImage(file, 'STRATEGY_IMAGES', `strategies/${strategyId}`)
         imageUrls.push(result.url)
 
         // Save image metadata to database with version association
