@@ -31,6 +31,29 @@ export const slideUp: Variants = {
   }
 }
 
+export const fadeInSlideUp: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 30
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.4, 0, 0.2, 1]
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: 30,
+    transition: {
+      duration: 0.3,
+      ease: [0.4, 0, 1, 1]
+    }
+  }
+}
+
 export const slideInFromLeft: Variants = {
   hidden: {
     opacity: 0,
@@ -103,6 +126,21 @@ export const staggerItem: Variants = {
   visible: {
     opacity: 1,
     y: 0
+  }
+}
+
+export const itemVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 20
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.3,
+      ease: [0.4, 0, 0.2, 1]
+    }
   }
 }
 

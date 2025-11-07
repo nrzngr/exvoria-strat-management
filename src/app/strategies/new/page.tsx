@@ -118,18 +118,12 @@ function NewStrategyContent() {
         const customDescription = imageDescriptions[index]?.trim() ||
           `Gambar strategi ${index + 1} untuk ${strategyId}`
 
-        // Truncate values to fit within database constraints (varchar(255))
-        const truncateString = (str: string, maxLength: number = 250): string => {
-          if (str.length <= maxLength) return str
-          return str.substring(0, maxLength - 3) + '...'
-        }
-
         await createStrategyImage(
           strategyId,
-          truncateString(result.path, 250),
+          result.path,
           'strategy-images',
-          truncateString(result.url, 250),
-          truncateString(customDescription, 250),
+          result.url,
+          customDescription,
           index,
           versionId // Associate with the version if provided
         )
@@ -455,8 +449,8 @@ function NewStrategyContent() {
                                 value={imageDescriptions[index] || ''}
                                 onChange={(e) => updateImageDescription(index, e.target.value)}
                                 className="glass-button w-full px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none resize-none"
-                                rows={3}
-                                placeholder="Describe this diagram (e.g., 'Initial setup positions', 'Flanking route', 'Final approach')"
+                                rows={5}
+                                placeholder="Provide detailed tactical description for this diagram. Include positions, movement patterns, timing, communication calls, and any important details..."
                                 disabled={submitting}
                               />
                             </div>

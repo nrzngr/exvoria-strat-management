@@ -575,6 +575,57 @@ export async function createStrategyImage(
   return data
 }
 
+export async function copyImagesToVersion(strategyId: string, fromVersionId?: string, toVersionId?: string): Promise<StrategyImage[]> {
+  if (!supabase) {
+    throw new Error('Image copying requires Supabase configuration')
+  }
+
+  // Get existing images associated with the old version (or unversioned images)
+  let query = supabase
+    .from('strategy_images')
+    .select('*')
+    .eq('strategy_id', strategyId)
+
+  // If fromVersionId is provided, get images from that version
+  // Otherwise, get images without version_id (unversioned)
+  if (fromVersionId) {
+    query = query.eq('version_id', fromVersionId)
+  } else {
+    query = query.is('version_id', null)
+  }
+
+  const { data: existingImages, error: fetchError } = await query.order('position_in_content')
+
+  if (fetchError) throw fetchError
+
+  // Copy each image to the new version
+  const copiedImages: StrategyImage[] = []
+  for (const image of existingImages || []) {
+    const { data: copiedImage, error: copyError } = await supabase
+      .from('strategy_images')
+      .insert({
+        strategy_id: strategyId,
+        version_id: toVersionId || null,
+        storage_path: image.storage_path,
+        bucket_name: image.bucket_name,
+        url: image.url,
+        alt_text: image.alt_text,
+        position_in_content: image.position_in_content,
+      })
+      .select()
+      .single()
+
+    if (copyError) {
+      console.error('Failed to copy image:', image.id, copyError)
+      continue // Skip this image but continue with others
+    }
+
+    copiedImages.push(copiedImage)
+  }
+
+  return copiedImages
+}
+
 export async function updateStrategyImage(imageId: string, altText: string): Promise<StrategyImage> {
   if (!supabase) {
     throw new Error('Strategy image update requires Supabase configuration')
