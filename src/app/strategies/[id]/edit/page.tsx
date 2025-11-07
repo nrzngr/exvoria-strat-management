@@ -6,12 +6,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Link from 'next/link'
-import { ArrowLeft, Save, FileText, MapPin, Upload, X, Image as ImageIcon, Plus, Trash2, CloudUpload, Loader2, Calendar, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Save, FileText, MapPin, Upload, X, Image as ImageIcon, Plus, Trash2, CloudUpload, Loader2, Calendar, TrendingUp, Edit } from 'lucide-react'
 import { getMaps, getStrategy, updateStrategy, createStrategyImage, deleteStrategyImage, updateStrategyImage, copyImagesToVersion } from '@/lib/database'
 import { uploadImage } from '@/lib/storage'
 import { Map, StrategyWithVersion } from '@/types/database'
 import EnvCheck from '@/components/env-check'
-import { MotionDiv, fadeIn, fadeInSlideUp, scaleIn, staggerItem, itemVariants } from '@/lib/animations'
+import { MotionDiv, fadeIn, fadeInSlideUp, scaleIn, staggerItem, staggerContainer, itemVariants } from '@/lib/animations'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const strategySchema = z.object({
@@ -482,9 +482,9 @@ export default function EditStrategyPage() {
                     </div>
                     <select
                       id="map_id"
-                      {...register('map_id')}
                       className="glass-button w-full pl-10 pr-3 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none"
                       disabled
+                      value={strategy.map?.name}
                     >
                       <option value="" className="bg-gray-800">{strategy.map?.name}</option>
                     </select>
