@@ -99,19 +99,19 @@ export default function MapsPage() {
           {/* Animated Background Gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-cyan-600/10 to-teal-600/10 rounded-2xl blur-3xl"></div>
 
-          <div className="relative glass-effect rounded-2xl p-8 border border-gray-800">
-            <div className="flex items-center justify-between">
+          <div className="relative glass-effect rounded-2xl p-6 sm:p-8 border border-gray-800">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-2">
                 <div className="flex items-center space-x-3">
                   <MotionDiv
                     animate={{ rotate: 360 }}
                     transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                    className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600/20 to-cyan-600/20 flex items-center justify-center border border-blue-500/30"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-blue-600/20 to-cyan-600/20 flex items-center justify-center border border-blue-500/30"
                   >
-                    <Compass className="h-6 w-6 text-blue-400" />
+                    <Compass className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
                   </MotionDiv>
                   <div>
-                    <h1 className="text-4xl font-bold text-gradient">Tactical Maps</h1>
+                    <h1 className="text-2xl sm:text-4xl font-bold text-gradient">Tactical Maps</h1>
                   </div>
                 </div>
               </div>
@@ -119,10 +119,11 @@ export default function MapsPage() {
                 variants={cardHover}
                 whileHover="hover"
                 whileTap="tap"
+                className="w-full sm:w-auto"
               >
                 <Link
                   href="/maps/new"
-                  className="glass-effect px-6 py-3 rounded-xl border border-blue-500/30 text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 hover:border-blue-500/50 flex items-center space-x-2 transition-all duration-300"
+                  className="w-full sm:w-auto glass-effect px-6 py-3 rounded-xl border border-blue-500/30 text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 hover:border-blue-500/50 flex items-center justify-center space-x-2 transition-all duration-300"
                 >
                   <Plus className="h-5 w-5" />
                   <span className="font-medium">Tambah Peta</span>
@@ -134,27 +135,27 @@ export default function MapsPage() {
 
         {/* Enhanced Search Bar */}
         <MotionDiv variants={staggerItem}>
-          <div className="glass-effect rounded-2xl p-6 border border-gray-800">
+          <div className="glass-effect rounded-2xl p-4 sm:p-6 border border-gray-800">
             <div className="relative">
               <MotionDiv
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400"
+                className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-blue-400"
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-4 w-4 sm:h-5 sm:w-5" />
               </MotionDiv>
               <input
                 type="text"
                 placeholder="Cari peta..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:bg-gray-800/70 transition-all duration-300"
+                className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:bg-gray-800/70 transition-all duration-300"
               />
               {searchQuery && (
                 <MotionDiv
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500"
+                  className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500"
                 >
                   {filteredMaps.length} peta ditemukan
                 </MotionDiv>
@@ -169,7 +170,7 @@ export default function MapsPage() {
             variants={scaleIn}
             initial="hidden"
             animate="visible"
-            className="glass-effect rounded-2xl p-12 text-center border border-gray-800"
+            className="glass-effect rounded-2xl p-6 sm:p-12 text-center border border-gray-800"
           >
             <div className="relative">
               {/* Animated Background Icons */}
@@ -223,7 +224,7 @@ export default function MapsPage() {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
           >
             {filteredMaps.map((map, index) => (
               <MotionDiv
@@ -275,7 +276,7 @@ export default function MapsPage() {
                   </div>
 
                   {/* Map Content */}
-                  <div className="p-6 space-y-4">
+                  <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                     {/* Title Section */}
                     <div className="space-y-2">
                       <h3 className="text-xl font-bold text-white group-hover:text-accent-blue transition-colors duration-300">
@@ -289,7 +290,7 @@ export default function MapsPage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                       <MotionDiv
                         variants={cardHover}
                         whileHover="hover"
@@ -298,10 +299,10 @@ export default function MapsPage() {
                       >
                         <Link
                           href={`/maps/${map.id}/strategies`}
-                          className="w-full glass-effect px-4 py-3 rounded-xl border border-blue-500/30 text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 hover:border-blue-500/50 flex items-center justify-center space-x-2 transition-all duration-300 text-sm font-medium"
+                          className="w-full glass-effect px-4 py-2 sm:py-3 rounded-xl border border-blue-500/30 text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 hover:border-blue-500/50 flex items-center justify-center space-x-2 transition-all duration-300 text-sm font-medium"
                         >
                           <Target className="h-4 w-4" />
-                          <span>Lihat Strategi</span>
+                          <span className="text-xs sm:text-sm">Lihat Strategi</span>
                         </Link>
                       </MotionDiv>
 

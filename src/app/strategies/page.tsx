@@ -84,8 +84,8 @@ export default function StrategiesPage() {
           {/* Animated Background Gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/3 to-white/2 rounded-2xl blur-3xl"></div>
 
-          <div className="relative glass-effect rounded-2xl p-8 border border-white/10 bg-black/40">
-            <div className="flex items-center justify-between">
+          <div className="relative glass-effect rounded-2xl p-6 sm:p-8 border border-white/10 bg-black/40">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-2">
                 <Link
                   href="/"
@@ -95,17 +95,18 @@ export default function StrategiesPage() {
                   Kembali ke Beranda
                 </Link>
                 <div>
-                  <h1 className="text-4xl font-bold text-gradient">Strategi</h1>
+                  <h1 className="text-2xl sm:text-4xl font-bold text-gradient">Strategi</h1>
                 </div>
               </div>
               <MotionDiv
                 variants={cardHover}
                 whileHover="hover"
                 whileTap="tap"
+                className="w-full sm:w-auto"
               >
                 <Link
                   href="/strategies/new"
-                  className="glass-effect px-6 py-3 rounded-xl border border-white/20 text-white hover:bg-white/10 hover:border-white/30 flex items-center space-x-2 transition-all duration-300"
+                  className="w-full sm:w-auto glass-effect px-6 py-3 rounded-xl border border-white/20 text-white hover:bg-white/10 hover:border-white/30 flex items-center justify-center space-x-2 transition-all duration-300"
                 >
                   <Plus className="h-5 w-5" />
                   <span className="font-medium">Strategi Baru</span>
@@ -136,7 +137,7 @@ export default function StrategiesPage() {
             variants={scaleIn}
             initial="hidden"
             animate="visible"
-            className="glass-effect rounded-2xl p-12 text-center border border-gray-800"
+            className="glass-effect rounded-2xl p-6 sm:p-12 text-center border border-gray-800"
           >
             <div className="relative">
               {/* Animated Background Icon */}
@@ -181,7 +182,7 @@ export default function StrategiesPage() {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
           >
             {strategies.map((strategy, index) => (
               <MotionDiv
@@ -193,7 +194,7 @@ export default function StrategiesPage() {
               >
                 <div className="glass-effect rounded-2xl overflow-hidden border border-white/10 bg-black/60 hover:border-white/20 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-white/10">
                   {/* Strategy Image Preview */}
-                  <div className="relative h-48 overflow-hidden">
+                  <div className="relative h-40 sm:h-48 overflow-hidden">
                     {/* Background gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
 
@@ -256,11 +257,11 @@ export default function StrategiesPage() {
                   </div>
 
                   {/* Strategy Content */}
-                  <div className="p-6 space-y-4">
+                  <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                     {/* Title Section */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 mr-3">
-                        <h3 className="text-xl font-bold text-white line-clamp-1 group-hover:text-gray-200 transition-colors duration-300">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3">
+                      <div className="flex-1 sm:mr-3">
+                        <h3 className="text-lg sm:text-xl font-bold text-white line-clamp-1 group-hover:text-gray-200 transition-colors duration-300">
                           {strategy.current_version?.title || 'Untitled Strategy'}
                         </h3>
                       </div>
@@ -296,11 +297,11 @@ export default function StrategiesPage() {
                     </p>
 
                     {/* Metadata */}
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 text-xs">
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-1 text-gray-500">
                           <MapPin className="h-3 w-3" />
-                          <span>{strategy.map?.name || 'Unknown'}</span>
+                          <span className="text-xs sm:text-xs">{strategy.map?.name || 'Unknown'}</span>
                         </div>
                         {(() => {
                           const currentVersionId = strategy.current_version?.id
@@ -312,7 +313,7 @@ export default function StrategiesPage() {
                             return (
                               <div className="flex items-center space-x-1 text-gray-500">
                                 <ImageIcon className="h-3 w-3" />
-                                <span>{currentVersionImageCount}</span>
+                                <span className="text-xs sm:text-xs">{currentVersionImageCount}</span>
                               </div>
                             )
                           }
@@ -321,7 +322,7 @@ export default function StrategiesPage() {
                       </div>
                       <div className="flex items-center space-x-1 text-gray-500">
                         <Clock className="h-3 w-3" />
-                        <span>v{strategy.current_version?.version_number || 1}</span>
+                        <span className="text-xs sm:text-xs">v{strategy.current_version?.version_number || 1}</span>
                       </div>
                     </div>
 
