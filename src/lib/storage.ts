@@ -26,7 +26,10 @@ export async function uploadImage(
       upsert: false,
     })
 
-  if (error) throw error
+  if (error) {
+    console.error('Storage upload error:', error)
+    throw error
+  }
 
   const { data: { publicUrl } } = supabase.storage
     .from(bucket)

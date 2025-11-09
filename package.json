@@ -2,6 +2,7 @@
   "name": "delta-force-strategy",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,6 +20,7 @@
     "@radix-ui/react-toast": "^1.2.15",
     "@supabase/supabase-js": "^2.79.0",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.552.0",
     "next": "16.0.1",

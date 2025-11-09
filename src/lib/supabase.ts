@@ -11,5 +11,5 @@ export const supabase = supabaseUrl && supabaseAnonKey
 // Storage bucket names
 export const STORAGE_BUCKETS = {
   MAP_THUMBNAILS: 'map-thumbnails',
-  STRATEGY_IMAGES: 'strategy-images',
+  STRATEGY_IMAGES: 'STRATEGY_IMAGES',
 } as const
